@@ -1,0 +1,30 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import avg
+
+spark = SparkSession.builder.appName("PySparkPractice").getOrCreate()
+
+data = [("Alice", 23), ("Bob", 30), ("Charlie", 25), ("Alice", 28)]
+columns = ["Name", "Age"]
+df = spark.createDataFrame(data, columns)
+
+print("Initial DataFrame:")
+df.show()
+
+print("Filtered (Age > 25):")
+df.filter(df.Age > 25).show()
+
+print("DataFrame with DoubleAge:")
+df_with_new = df.withColumn("DoubleAge", df.Age * 2)
+df_with_new.show()
+
+print("Average Age per Name:")
+df.groupBy("Name").agg(avg("Age").alias("AverageAge")).show()
+
+df.createOrReplaceTempView("people")
+
+print("SQL Query (Age > 25):")
+spark.sql("SELECT * FROM people WHERE Age > 25").show()
+
+# df.write.csv("output_folder", header=True, mode="overwrite")
+
+spark.stop()
